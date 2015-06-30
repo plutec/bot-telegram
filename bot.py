@@ -14,10 +14,13 @@ class Message(object):
         self.chat_id = self.obj['message']['chat']['id']
         self.update_id = self.obj['update_id']
         self.text = None
-        #print 'OBJ %s' % str(obj)
+        print 'OBJ %s' % str(obj)
 
     def from_username(self):
-        return self.obj['message']['from']['username']
+        to_ret = self.obj['message']['from'].get('username', None)
+        if not to_ret:
+            to_ret = self.obj['message']['from']['first_name']
+        return to_ret
 
     def to_username(self):
         return self.get_chat_title()
@@ -33,7 +36,7 @@ class Message(object):
     def get_chat_title(self):
         to_ret = self.obj['message']['chat'].get('title', None)
         if not to_ret:
-            return self.obj['message']['chat']['username']
+            to_ret = self.obj['message']['chat'].get('username', None)
         return to_ret
 
 class TelegramBot:
