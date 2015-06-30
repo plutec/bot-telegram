@@ -109,14 +109,14 @@ class HispaTroll(TelegramBot):
 
     def process_update(self, message):
         #print message.get_chat_title()
-        #if message.get_chat_title() != 'Hispapechotes':
-            #if message.username() == 'plutec':
         if message.get_text().startswith('/tetas'):
             self.send_tits(message)
-        if message.get_text().startswith('/help'):
+        elif message.get_text().startswith('/help'):
             self.send_help(message)
-        if message.get_text().startswith('/hora'):
+        elif message.get_text().startswith('/hora'):
             self.send_time(message)
+        elif message.get_text().startswith('/ubre'):
+            self.send_photo(message.chat_id, 'ubre.jpg')
 
 
 def main():
