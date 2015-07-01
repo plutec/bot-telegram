@@ -14,7 +14,6 @@ class Message(object):
         self.chat_id = self.obj['message']['chat']['id']
         self.update_id = self.obj['update_id']
         self.text = None
-        print 'OBJ %s' % str(obj)
 
     def from_username(self):
         to_ret = self.obj['message']['from'].get('username', None)
