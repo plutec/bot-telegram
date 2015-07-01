@@ -58,8 +58,8 @@ class TelegramBot:
         for update in r['result']:
             message = Message(update)
             if settings.DEBUG:
-                print "[%s->%s]: %s" % (message.from_username(), 
-                                       message.to_username(), 
+                print "[%s->%s]: %s" % (message.from_username(),
+                                       message.to_username(),
                                        message.get_text())
             self.process_update(message)
             self.offset = message.update_id
@@ -110,16 +110,24 @@ class HispaTroll(TelegramBot):
         """
         self.reply(message.chat_id, datetime.datetime.now())
 
+    def send_matica(self, message):
+        """
+            Correct text changing 'matica' for a better one
+        """
+        self.reply(message.chat_id, message.text.replace("matica", "matica64"))
+
     def process_update(self, message):
         #print message.get_chat_title()
-        if message.get_text().startswith('/tetas'):
+        if message.get_text() == '/tetas':
             self.send_tits(message)
-        elif message.get_text().startswith('/help'):
+        elif message.get_text() == '/help':
             self.send_help(message)
-        elif message.get_text().startswith('/hora'):
+        elif message.get_text() == '/hora':
             self.send_time(message)
-        elif message.get_text().startswith('/ubre'):
+        elif message.get_text() == '/ubre':
             self.send_photo(message.chat_id, 'ubre.jpg')
+        elif "matica" in message.get_text():
+            self.send_matica(message)
 
 
 def main():
