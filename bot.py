@@ -8,12 +8,21 @@ import datetime
 import random
 
 class Message(object):
+    NORMAL_MESSAGE = 1
+    JOIN_GROUP = 2
+    LEFT_GROUP = 3
     def __init__(self, obj):
         self.obj = obj
         #Extract the most used values
         self.chat_id = self.obj['message']['chat']['id']
         self.update_id = self.obj['update_id']
         self.text = None
+        self.type = self.NORMAL_MESSAGE
+        if self.obj['message'].has_key('new_chat_participant'):
+            self.type = self.JOIN_GROUP
+        elif self.obj['message'].has_key('left_chat_participant'):
+            self.type = self.LEFT_GROUP
+        #print "OBJ %s" % str(obj)
 
     def from_username(self):
         to_ret = self.obj['message']['from'].get('username', None)
@@ -28,6 +37,8 @@ class Message(object):
         return self.chat_id
 
     def get_text(self):
+        if self.type != self.NORMAL_MESSAGE:
+            return ""
         if not self.text:
             self.text = self.obj['message']['text']
         return self.text
