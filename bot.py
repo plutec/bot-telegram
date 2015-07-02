@@ -28,8 +28,14 @@ class Message(object):
             to_ret = self.obj['message']['from']['first_name']
         return to_ret
 
+    def from_id(self):
+	return self.obj['message']['chat']['id']
+
     def to_username(self):
-        return self.get_chat_title()
+        chat_title = self.get_chat_title()
+	if chat_title == self.from_username():
+	    return "Me" 
+	return self.get_chat_title()
 
     def get_chat_id(self):
         return self.chat_id
@@ -62,6 +68,9 @@ class TelegramBot:
         res = requests.post(url, params=params, files=files)
         return res.json()
 
+    def allowed(self, message):
+	return message.from_id() in settings.ALLOWED_CHATS	    
+
     def updates(self):
         data = {'offset': self.offset}
         r = self.query('getUpdates', data)
@@ -80,7 +89,10 @@ class TelegramBot:
                     print "%s LEFT GROUP %s" % \
                         (update['message']['left_chat_participant']['username'],
                          message.get_chat_title())
-            self.process_update(message)
+	    if self.allowed(message):
+            	self.process_update(message)
+	    else:
+		self.send_msg(message.chat_id, "Quiero irme, no estoy agusto")
             self.offset = message.update_id
             self.offset += 1
         open('offset', 'wt').write('%s' % self.offset)
