@@ -69,7 +69,9 @@ class TelegramBot:
         return res.json()
 
     def allowed(self, message):
-	return message.from_id() in settings.ALLOWED_CHATS	    
+	if message.type == Message.NORMAL_MESSAGE:
+	    return message.from_id() in settings.ALLOWED_CHATS
+	return False
 
     def updates(self):
         data = {'offset': self.offset}
