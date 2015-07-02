@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
-import time
 import requests
 import settings
-import os
-import datetime
-import random
+import time
 
 class Message(object):
     NORMAL_MESSAGE = 1
     JOIN_GROUP = 2
     LEFT_GROUP = 3
+
     def __init__(self, obj):
         self.obj = obj
         #Extract the most used values
@@ -22,7 +20,7 @@ class Message(object):
             self.type = self.JOIN_GROUP
         elif self.obj['message'].has_key('left_chat_participant'):
             self.type = self.LEFT_GROUP
-        #print "OBJ %s" % str(obj)
+        print "OBJ %s" % str(obj)
 
     def from_username(self):
         to_ret = self.obj['message']['from'].get('username', None)
@@ -40,7 +38,10 @@ class Message(object):
         if self.type != self.NORMAL_MESSAGE:
             return ""
         if not self.text:
-            self.text = self.obj['message']['text']
+            try:
+                self.text = self.obj['message']['text']
+            except:
+                self.text = ""
         return self.text
 
     def get_chat_title(self):
@@ -62,15 +63,23 @@ class TelegramBot:
         return res.json()
 
     def updates(self):
-        print('Updating')
         data = {'offset': self.offset}
         r = self.query('getUpdates', data)
         for update in r['result']:
             message = Message(update)
             if settings.DEBUG:
-                print "[%s->%s]: %s" % (message.from_username(),
-                                       message.to_username(),
-                                       message.get_text())
+                if message.type == Message.NORMAL_MESSAGE:
+                    print "[%s->%s]: %s" % (message.from_username(),
+                                           message.to_username(),
+                                           message.get_text())
+                elif message.type == Message.JOIN_GROUP:
+                    print "%s JOIN GROUP %s" % \
+                        (update['message']['new_chat_participant']['username'],
+                         message.get_chat_title())
+                elif message.type == Message.LEFT_GROUP:
+                    print "%s LEFT GROUP %s" % \
+                        (update['message']['left_chat_participant']['username'],
+                         message.get_chat_title())
             self.process_update(message)
             self.offset = message.update_id
             self.offset += 1
@@ -83,7 +92,7 @@ class TelegramBot:
         resp = self.query('sendPhoto', params={'chat_id':chat_id},
                                        files= {'photo':open(filename, 'rb')})
 
-    def reply(self, to, msg):
+    def send_msg(self, to, msg):
         resp = self.query('sendMessage', {'chat_id': to, 'text': msg})
         return resp
 
@@ -91,58 +100,3 @@ class TelegramBot:
         while True:
             self.updates()
             time.sleep(1)
-
-
-class HispaTroll(TelegramBot):
-
-    def __init__(self):
-        random.seed(time.time())
-        self.available_images = os.listdir(settings.IMAGES_DIR)
-        TelegramBot.__init__(self)
-
-    def send_tits(self, message):
-        """
-            Send a random image
-        """
-        num = random.randrange(0, len(self.available_images))
-        path = os.path.join(settings.IMAGES_DIR, self.available_images[num])
-        self.send_photo(message.chat_id, path)
-
-    def send_help(self, message):
-        """
-            Send commands availables to the group
-        """
-        self.reply(message.chat_id, settings.HELP_TEXT)
-
-    def send_time(self, message):
-        """
-            Send the actually time
-        """
-        self.reply(message.chat_id, datetime.datetime.now())
-
-    def send_matica(self, message):
-        """
-            Correct text changing 'matica' for a better one
-        """
-        self.reply(message.chat_id, message.text.replace("matica", "matica64"))
-
-    def process_update(self, message):
-        #print message.get_chat_title()
-        if message.get_text() == '/tetas':
-            self.send_tits(message)
-        elif message.get_text() == '/help':
-            self.send_help(message)
-        elif message.get_text() == '/hora':
-            self.send_time(message)
-        elif message.get_text() == '/ubre':
-            self.send_photo(message.chat_id, 'ubre.jpg')
-        elif "matica" in message.get_text():
-            self.send_matica(message)
-
-
-def main():
-    bot = HispaTroll()
-    bot.run()
-
-if __name__ == '__main__':
-    main()
