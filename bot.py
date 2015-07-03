@@ -31,6 +31,15 @@ class Message(object):
     def from_id(self):
 	return self.obj['message']['chat']['id']
 
+    def get_left_chat_username(self):
+	try:
+	    return self.obj['message']['left_chat_participant']['username']
+	except:
+	    try:
+		return self.obj['message']['left_chat_participant']['first_name']
+	    except:
+		return ""
+
     def to_username(self):
         chat_title = self.get_chat_title()
 	if chat_title == self.from_username():
@@ -89,7 +98,7 @@ class TelegramBot:
                          message.get_chat_title())
                 elif message.type == Message.LEFT_GROUP:
                     print "%s LEFT GROUP %s" % \
-                        (update['message']['left_chat_participant']['username'],
+                        (message.get_left_chat_username(),
                          message.get_chat_title())
 	    if self.allowed(message):
             	self.process_update(message)
