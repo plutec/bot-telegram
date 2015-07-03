@@ -4,6 +4,7 @@ import random
 import time
 import settings
 import datetime
+import koodous
 
 class HispaTroll(bot.TelegramBot):
 
@@ -12,7 +13,7 @@ class HispaTroll(bot.TelegramBot):
         self.available_images = os.listdir(settings.IMAGES_DIR)
         bot.TelegramBot.__init__(self)
 
-    def send_tits(self, message):
+    def _send_tits(self, message):
         """
             Send a random image
         """
@@ -20,39 +21,54 @@ class HispaTroll(bot.TelegramBot):
         path = os.path.join(settings.IMAGES_DIR, self.available_images[num])
         self.send_photo(message.chat_id, path)
 
-    def send_help(self, message):
+    def _send_help(self, message):
         """
             Send commands availables to the group
         """
         self.send_msg(message.chat_id, settings.HELP_TEXT)
 
-    def send_time(self, message):
+    def _send_time(self, message):
         """
             Send the actually time
         """
         self.send_msg(message.chat_id, datetime.datetime.now())
 
-    def send_matica(self, message):
+    def _send_matica(self, message):
         """
             Correct text changing 'matica' for a better one
         """
         self.send_msg(message.chat_id, message.text.replace("matica", "matica64"))
+
+    def _send_hash_info(self, message, info):
+        msg = """Package name: %s
+APP Name: %s
+Detected: %s
+Developer: %s
+""" % (info['package_name'], info['app'], info['detected'],info['company'])
+        self.send_msg(message.chat_id, msg)
 
     def process_update(self, message):
         #print message.get_chat_title()
         if message.get_from_firstname() == 'Carlos' and random.random()>0.5:
             self.send_msg(message.chat_id, "De grandes como a ti te gustan RAVOSNons ;)")
         elif message.get_text() == '/tetas':
-            self.send_tits(message)
+            self._send_tits(message)
         elif message.get_text() == '/help':
-            self.send_help(message)
+            self._send_help(message)
+        elif message.get_text().startswith('/koodous'):
+            try:   
+                sha256 = message.get_text().split(' ')[1]
+                info = koodous.apk_info(sha256)
+                self._send_hash_info(message, info)
+            except:
+                self.send_msg(message.chat_id, "No entiendo lo que quieres de Koodous")
         elif message.get_text() == '/hora':
-            self.send_time(message)
+            self._send_time(message)
         elif message.get_text() == '/ubre':
             self.send_photo(message.chat_id, 'ubre.jpg')
         elif "matica" in message.get_text() and \
              not "matica64" in message.get_text():
-            self.send_matica(message)
+            self._send_matica(message)
 
 
 def main():
