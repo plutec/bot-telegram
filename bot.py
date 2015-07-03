@@ -27,6 +27,9 @@ class Message(object):
         if not to_ret:
             to_ret = self.obj['message']['from']['first_name']
         return to_ret
+    
+    def get_from_firstname(self):
+	return self.obj['message']['from']['first_name']
 
     def from_id(self):
 	return self.obj['message']['chat']['id']

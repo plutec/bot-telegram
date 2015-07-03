@@ -40,7 +40,7 @@ class HispaTroll(bot.TelegramBot):
 
     def process_update(self, message):
         #print message.get_chat_title()
-        if message.from_username() == 'Ravenons' and random.random()>0.5:
+        if message.get_from_firstname() == 'Carlos' and random.random()>0.5:
             self.send_msg(message.chat_id, "De grandes como a ti te gustan RAVOSNons ;)")
         elif message.get_text() == '/tetas':
             self.send_tits(message)
