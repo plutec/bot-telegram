@@ -1,10 +1,11 @@
+import base64
 import bot
-import os
-import random
-import time
-import settings
 import datetime
 import koodous
+import os
+import random
+import settings
+import time
 
 class HispaTroll(bot.TelegramBot):
 
@@ -39,6 +40,16 @@ class HispaTroll(bot.TelegramBot):
         """
         self.send_msg(message.chat_id, message.text.replace("matica", "matica64"))
 
+    def _send_hispa(self, message):
+        """
+            Send Hispa Info
+        """
+        info = "SGlzcGFzZWMgU2lzdGVtYXMgUy5MLiAKQy8gVHJpbmlkYWQgR3J1bmQgMTIsIDFB\
+                LTFCIAoyOTAwMSBNw6FsYWdhIApFc3Bhw7FhCkNJRjogQjkyMTgzOTM4ClRsZjog\
+                KzM0IDk1MiAwMjAgNDk0IAoKCg=="
+
+        self.send_msg(message.chat_id, base64.b64decode(info.strip()))
+
     def _send_hash_info(self, message, info):
         msg = """Package name: %s
 APP Name: %s
@@ -50,27 +61,35 @@ Developer: %s
     def process_update(self, message):
         #print message.get_chat_title()
         if message.get_from_firstname() == 'Carlos' and \
-		message.get_text() != 'De grandes como a ti te gustan RAVOSNons ;)' and random.random()>0.5:
+		message.get_text() != 'De grandes como a ti te gustan RAVOSNons ;)' and random.random()>0.8:
             self.send_msg(message.chat_id, "De grandes como a ti te gustan RAVOSNons ;)")
+
         elif message.get_text() == '/tetas':
             self._send_tits(message)
+
         elif message.get_text() == '/help':
             self._send_help(message)
+
         elif message.get_text().startswith('/koodous'):
-            try:   
+            try:
                 sha256 = message.get_text().split(' ')[1]
                 info = koodous.apk_info(sha256)
                 self._send_hash_info(message, info)
             except:
                 self.send_msg(message.chat_id, "No entiendo lo que quieres de Koodous")
+
         elif message.get_text() == '/hora':
             self._send_time(message)
+
         elif message.get_text() == '/ubre':
             self.send_photo(message.chat_id, 'ubre.jpg')
+
         elif "matica" in message.get_text() and \
              not "matica64" in message.get_text():
             self._send_matica(message)
 
+        elif message.get_text() == '/hispa':
+            self._send_hispa(message)
 
 def main():
     bot = HispaTroll()

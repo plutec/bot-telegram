@@ -27,7 +27,7 @@ class Message(object):
         if not to_ret:
             to_ret = self.obj['message']['from']['first_name']
         return to_ret
-    
+
     def get_from_firstname(self):
 	return self.obj['message']['from']['first_name']
 
@@ -46,7 +46,7 @@ class Message(object):
     def to_username(self):
         chat_title = self.get_chat_title()
 	if chat_title == self.from_username():
-	    return "Me" 
+	    return "Me"
 	return self.get_chat_title()
 
     def get_chat_id(self):
