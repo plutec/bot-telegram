@@ -1,5 +1,6 @@
 settings.py
 images/*
+offset
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
