@@ -7,6 +7,13 @@ import random
 import settings
 import time
 
+HELP_TEXT = """
+/help -> Te muestro esta ayudita
+/hora -> Te digo qu   hora es aunque no sirve para nada
+/tetas -> Te mando una foto muy simp  tica
+"""
+
+
 class HispaTroll(bot.TelegramBot):
 
     def __init__(self):
@@ -26,7 +33,7 @@ class HispaTroll(bot.TelegramBot):
         """
             Send commands availables to the group
         """
-        self.send_msg(message.chat_id, settings.HELP_TEXT)
+        self.send_msg(message.chat_id, HELP_TEXT)
 
     def _send_time(self, message):
         """
